@@ -5,27 +5,62 @@ class Calculator {
         this.clear()
     }
 
-    clear(){
+    clear() {
         this.currentOperand = ''
         this.previousOperand = ''
         this.operation = undefined
     }
-    delete(){
-
+    delete() {
+        this.currentOperand = this.currentOperand.toString().slice(0, -1);
     }
 
-    appendNumber(number){
-        this.currentOperand = number
+    appendNumber(number) {
+        if (number == '.' && this.currentOperand.includes('.')) return
+        this.currentOperand = this.currentOperand.toString() + number.toString()
     }
 
-    chooseOperation(operation){
-
+    chooseOperation(operation) {
+        if (this.currentOperand === '') return
+        if (this.previousOperand !== '') {
+            this.compute()
+        }
+        this.operation = operation
+        this.previousOperand = this.currentOperand
+        this.currentOperand = ''
     }
-    compute(){
-
+    compute() {
+        let computation
+        // the below converts the string to a number
+        const prev = parseFloat(this.previousOperand);
+        const current = parseFloat(this.currentOperand);
+        if (isNaN(prev) || isNaN(current)) return
+        // a switch statement is like an if statement, but allows you to do a bunch of if statements on a single object
+        // you define an if statemenet by the keyword of "case"
+        switch (this.operation) {
+            case '+':
+                computation = prev + current
+                break
+            case '-':
+                computation = prev - current
+                break
+            case '*':
+                computation = prev * current
+                break
+            case '/':
+                computation = prev / current
+                break
+    // along with the if statements (case) we also can do else statements which is defined as "default" when doing a switch statement
+    // see initial explanation in comment on line 37
+            default:
+                return 
+        }
+        this.currentOperand = computation;
+        this.operation = undefined;
+        this.previousOperand = '';
     }
-    updateDisplay(){
+    updateDisplay() {
         this.currentOperandTextElement.innerText = this.currentOperand
+        this.previousOperandTextElement.innerText = this.previousOperand
     }
 }
 
@@ -45,4 +80,26 @@ numberButtons.forEach(button => {
         calculator.appendNumber(button.innerText)
         calculator.updateDisplay()
     })
+})
+
+operationButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        calculator.chooseOperation(button.innerText)
+        calculator.updateDisplay()
+    })
+})
+
+equalsButton.addEventListener('click', button => {
+    calculator.compute();
+    calculator.updateDisplay();
+})
+
+allClearButton.addEventListener('click', button => {
+    calculator.clear();
+    calculator.updateDisplay();
+})
+
+deleteButton.addEventListener('click', button => {
+    calculator.delete();
+    calculator.updateDisplay();
 })
